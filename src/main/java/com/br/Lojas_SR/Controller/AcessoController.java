@@ -14,7 +14,7 @@ public class AcessoController {
     @Autowired
     private AcessoService acessoService;
 
-    // Registro de novo usuário
+    // Registro de novo usuario
     @PostMapping("/registro")
     public ResponseEntity<Usuario> registrar(@RequestBody Usuario usuario) {
         Usuario novoUsuario = acessoService.registrar(usuario);
@@ -28,21 +28,21 @@ public class AcessoController {
         return ResponseEntity.ok(token);
     }
 
-    // Buscar usuário por ID
+    // Busca usuario por ID
     @GetMapping("/{id}")
     public ResponseEntity<Usuario> buscarPorId(@PathVariable Long id) {
         Usuario usuario = acessoService.buscarPorId(id);
         return ResponseEntity.ok(usuario);
     }
 
-    // Atualizar dados do usuário
+    // Atualiza dados do usuário
     @PutMapping("/{id}")
     public ResponseEntity<Usuario> atualizar(@PathVariable Long id, @RequestBody Usuario usuario) {
         Usuario atualizado = acessoService.atualizar(id, usuario);
         return ResponseEntity.ok(atualizado);
     }
 
-    // Deletar usuário
+    // Deleta usuário
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         acessoService.deletar(id);

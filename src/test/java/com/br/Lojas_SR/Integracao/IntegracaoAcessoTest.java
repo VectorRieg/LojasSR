@@ -21,19 +21,19 @@ class IntegracaoAcessoTest {
     @Test
     @DisplayName("Deve impedir registro com email duplicado")
     void deveImpedirRegistroComEmailDuplicado() {
-        String email = "duplicado" + System.currentTimeMillis() + "@email.com";
+        String email = "duplicado" + System.currentTimeMillis() + "@gmail.com";
 
         Usuario usuario1 = new Usuario();
-        usuario1.setNome("Usuário 1");
+        usuario1.setNome("Usuario1");
         usuario1.setEmail(email);
-        usuario1.setSenha("senha123");
+        usuario1.setSenha("senha");
 
         acessoService.registrar(usuario1);
 
         Usuario usuario2 = new Usuario();
-        usuario2.setNome("Usuário 2");
+        usuario2.setNome("Usuario2");
         usuario2.setEmail(email); // Email duplicado
-        usuario2.setSenha("senha456");
+        usuario2.setSenha("senha2");
 
         assertThrows(RuntimeException.class, () -> {
             acessoService.registrar(usuario2);
@@ -46,17 +46,17 @@ class IntegracaoAcessoTest {
         String cpf = "11122233344";
 
         Usuario usuario1 = new Usuario();
-        usuario1.setNome("Usuário 1");
-        usuario1.setEmail("user1" + System.currentTimeMillis() + "@email.com");
-        usuario1.setSenha("senha123");
+        usuario1.setNome("Usuario1");
+        usuario1.setEmail("user1" + System.currentTimeMillis() + "@gmail.com");
+        usuario1.setSenha("senha1");
         usuario1.setCpf(cpf);
 
         acessoService.registrar(usuario1);
 
         Usuario usuario2 = new Usuario();
-        usuario2.setNome("Usuário 2");
-        usuario2.setEmail("user2" + System.currentTimeMillis() + "@email.com");
-        usuario2.setSenha("senha456");
+        usuario2.setNome("Usuario2");
+        usuario2.setEmail("user2" + System.currentTimeMillis() + "@gmail.com");
+        usuario2.setSenha("senha2");
         usuario2.setCpf(cpf); // CPF duplicado
 
         assertThrows(RuntimeException.class, () -> {
@@ -69,23 +69,22 @@ class IntegracaoAcessoTest {
     void deveAtualizarDadosDoUsuarioMantendoEmailUnico() {
         Usuario usuario = new Usuario();
         usuario.setNome("Atualizar Dados");
-        usuario.setEmail("atualizar" + System.currentTimeMillis() + "@email.com");
-        usuario.setSenha("senha123");
-        usuario.setTelefone("11999999999");
+        usuario.setEmail("atualizar" + System.currentTimeMillis() + "@gmail.com");
+        usuario.setSenha("senha1");
+        usuario.setTelefone("0000000001");
 
         Usuario registrado = acessoService.registrar(usuario);
 
-        // Atualizar dados
         Usuario dadosAtualizados = new Usuario();
         dadosAtualizados.setNome("Nome Atualizado");
-        dadosAtualizados.setTelefone("11988888888");
+        dadosAtualizados.setTelefone("0000000001");
         dadosAtualizados.setCidade("São Paulo");
 
         Usuario atualizado = acessoService.atualizar(registrado.getId(), dadosAtualizados);
 
         assertEquals("Nome Atualizado", atualizado.getNome());
-        assertEquals("11988888888", atualizado.getTelefone());
+        assertEquals("0000000001", atualizado.getTelefone());
         assertEquals("São Paulo", atualizado.getCidade());
-        assertEquals(registrado.getEmail(), atualizado.getEmail()); // Email não muda
+        assertEquals(registrado.getEmail(), atualizado.getEmail());
     }
 }

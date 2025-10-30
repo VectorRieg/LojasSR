@@ -8,17 +8,9 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-/**
- * Utilitário para trabalhar com Basic Authentication
- * Substitui a antiga configuração JWT
- */
 @Component
 public class AcessoConfig {
 
-    /**
-     * Obtém o usuário autenticado no contexto atual
-     * @return Email do usuário autenticado
-     */
     public String getAuthenticatedUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -35,10 +27,8 @@ public class AcessoConfig {
         return null;
     }
 
-    /**
-     * Verifica se há um usuário autenticado
-     * @return true se houver usuário autenticado
-     */
+
+     //Verifica se há um usuário autenticado
     public boolean isAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication != null
@@ -46,10 +36,7 @@ public class AcessoConfig {
                 && !"anonymousUser".equals(authentication.getPrincipal());
     }
 
-    /**
-     * Obtém os detalhes completos do usuário autenticado
-     * @return UserDetails do usuário autenticado
-     */
+    //Obtém os detalhes completos do usuário autenticado
     public UserDetails getAuthenticatedUserDetails() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -60,14 +47,6 @@ public class AcessoConfig {
         return null;
     }
 
-    /**
-     * Gera o header de Authorization para Basic Auth
-     * Útil para testes ou chamadas internas
-     *
-     * @param username Email do usuário
-     * @param password Senha do usuário
-     * @return String no formato "Basic base64(username:password)"
-     */
     public String generateBasicAuthHeader(String username, String password) {
         String credentials = username + ":" + password;
         String encodedCredentials = Base64.getEncoder()
@@ -75,12 +54,7 @@ public class AcessoConfig {
         return "Basic " + encodedCredentials;
     }
 
-    /**
-     * Decodifica um header Basic Auth
-     *
-     * @param authHeader Header de Authorization completo
-     * @return Array [username, password] ou null se inválido
-     */
+    //Decodifica um header B
     public String[] decodeBasicAuthHeader(String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Basic ")) {
             return null;
@@ -104,20 +78,12 @@ public class AcessoConfig {
         return null;
     }
 
-    /**
-     * Obtém a Authentication atual
-     * @return Authentication object
-     */
+    //Obtém a Authenticação
     public Authentication getAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
     }
 
-    /**
-     * Verifica se o usuário autenticado tem uma role específica
-     *
-     * @param role Nome da role (sem prefixo ROLE_)
-     * @return true se o usuário tem a role
-     */
+    //Verifica se o usuário autenticado tem uma role específica
     public boolean hasRole(String role) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -130,10 +96,7 @@ public class AcessoConfig {
                         grantedAuthority.getAuthority().equals("ROLE_" + role));
     }
 
-    /**
-     * Limpa o contexto de segurança
-     * Útil para logout manual ou testes
-     */
+    //Limpa o contexto de segurança
     public void clearAuthentication() {
         SecurityContextHolder.clearContext();
     }

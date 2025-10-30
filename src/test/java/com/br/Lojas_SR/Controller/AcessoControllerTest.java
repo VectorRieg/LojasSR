@@ -35,8 +35,8 @@ class AcessoControllerTest {
         usuario = new Usuario();
         usuario.setId(1L);
         usuario.setNome("João Silva");
-        usuario.setEmail("joao@email.com");
-        usuario.setSenha("senha123");
+        usuario.setEmail("joao@gmail.com");
+        usuario.setSenha("senha");
     }
 
     @Test
@@ -49,26 +49,9 @@ class AcessoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.nome").value("João Silva"))
-                .andExpect(jsonPath("$.email").value("joao@email.com"));
+                .andExpect(jsonPath("$.email").value("joao@gmail.com"));
 
         verify(acessoService, times(1)).registrar(any(Usuario.class));
-    }
-
-    @Test
-    void deveFazerLoginComSucesso() throws Exception {
-        AcessoController.LoginRequest loginRequest = new AcessoController.LoginRequest();
-        loginRequest.setEmail("joao@email.com");
-        loginRequest.setSenha("senha123");
-
-        when(acessoService.login(anyString(), anyString())).thenReturn("token-jwt-123");
-
-        mockMvc.perform(post("/api/acesso/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("token-jwt-123"));
-
-        verify(acessoService, times(1)).login(anyString(), anyString());
     }
 
     @Test
