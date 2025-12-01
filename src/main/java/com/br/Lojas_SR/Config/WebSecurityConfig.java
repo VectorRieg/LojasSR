@@ -1,6 +1,7 @@
 package com.br.Lojas_SR.Config;
 
 import com.br.Lojas_SR.Repository.AcessoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -27,11 +29,12 @@ import java.util.Arrays;
 public class WebSecurityConfig {
 
     private final AcessoRepository acessoRepository;
-    private final AutentikConfig autentikConfig;
 
-    public WebSecurityConfig(AcessoRepository acessoRepository, AutentikConfig autentikConfig) {
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public WebSecurityConfig(AcessoRepository acessoRepository) {
         this.acessoRepository = acessoRepository;
-        this.autentikConfig = autentikConfig;
     }
 
     @Bean
@@ -40,23 +43,24 @@ public class WebSecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+                        // Endpoints públicos
                         .requestMatchers(HttpMethod.POST, "/api/acesso/registro").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/acesso/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/produtos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/produtos").permitAll()
+                        // Endpoints autenticados
                         .requestMatchers("/api/carrinho/**").authenticated()
                         .requestMatchers("/api/itens/**").authenticated()
                         .requestMatchers("/api/pagamentos/**").authenticated()
                         .requestMatchers("/api/acesso/**").authenticated()
+                        .requestMatchers("/api/usuarios/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .httpBasic(basic -> basic
-                        .realmName("Lojas SR API")
-                        .authenticationEntryPoint(autentikConfig)
-                )
-                .userDetailsService(userDetailsService());
+                // Adiciona o filtro JWT antes do filtro padrão de autenticação
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -64,11 +68,21 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://localhost:4200"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:3000",
+                "http://localhost:4200",
+                "http://localhost:8080"
+        ));
+        configuration.setAllowedMethods(Arrays.asList(
+                "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
+        ));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
-        configuration.setExposedHeaders(Arrays.asList("Authorization", "WWW-Authenticate"));
+        configuration.setExposedHeaders(Arrays.asList(
+                "Authorization",
+                "WWW-Authenticate",
+                "Content-Disposition"
+        ));
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
