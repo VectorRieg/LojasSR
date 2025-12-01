@@ -39,6 +39,12 @@ public class PagamentoController {
         return ResponseEntity.ok(pagamentos);
     }
 
+    @PostMapping("/{id}/processar")
+    public ResponseEntity<Pagamento> processar(@PathVariable Long id) {
+        Pagamento pagamento = pagamentoService.processar(id);
+        return ResponseEntity.ok(pagamento);
+    }
+
     @PutMapping("/{id}/confirmar")
     public ResponseEntity<Pagamento> confirmar(@PathVariable Long id) {
         Pagamento pagamento = pagamentoService.confirmar(id);

@@ -28,6 +28,12 @@ public class Produto {
     private String marca;
     private String codigo; // código único do produto
 
+    private Boolean ativo = true;
+    private Boolean destaque = false;
+    private Boolean emPromocao = false;
+    private BigDecimal precoPromocional;
+    private LocalDateTime dataCadastro;
+
     @OneToMany(mappedBy = "produto")
     private List<Item> itens;
 
@@ -51,4 +57,14 @@ public class Produto {
     public void setMarca(String marca) { this.marca = marca; }
     public String getCodigo() { return codigo; }
     public void setCodigo(String codigo) { this.codigo = codigo; }
+    public Boolean getAtivo() { return ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
+    public Boolean getDestaque() { return destaque; }
+    public void setDestaque(Boolean destaque) { this.destaque = destaque; }
+    public Boolean getEmPromocao() { return emPromocao; }
+    public void setEmPromocao(Boolean emPromocao) { this.emPromocao = emPromocao; }
+    public BigDecimal getPrecoPromocional() { return precoPromocional; }
+    public void setPrecoPromocional(BigDecimal precoPromocional) { this.precoPromocional = precoPromocional; }
+    public LocalDateTime getDataCadastro() { return dataCadastro; }
+    public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
 }

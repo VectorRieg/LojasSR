@@ -1,10 +1,14 @@
 package com.br.Lojas_SR.Service;
 
+import com.br.Lojas_SR.DTO.LoginResponse;
+import com.br.Lojas_SR.DTO.RegistroResponse;
 import com.br.Lojas_SR.Entity.Usuario;
 import com.br.Lojas_SR.Repository.AcessoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -13,8 +17,11 @@ public class AcessoService {
     @Autowired
     private AcessoRepository acessoRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     // Registrar novo usuário
-    public Usuario registrar(Usuario usuario) {
+    public RegistroResponse registrar(Usuario usuario) {
         // Validar se email já existe
         if (acessoRepository.existsByEmail(usuario.getEmail())) {
             throw new RuntimeException("Email já cadastrado");
@@ -25,31 +32,61 @@ public class AcessoService {
             throw new RuntimeException("CPF já cadastrado");
         }
 
-        // Aqui você deve criptografar a senha (BCrypt)
-        // usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+        // Guardar senha original para gerar token
+        String senhaOriginal = usuario.getSenha();
 
-        return acessoRepository.save(usuario);
+        // Criptografar a senha
+        usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
+        usuario.setAtivo(true);
+
+        Usuario usuarioSalvo = acessoRepository.save(usuario);
+
+        // Gerar token (usando Basic Auth por enquanto)
+        String token = gerarToken(usuarioSalvo.getEmail(), senhaOriginal);
+
+        // Criar resposta
+        RegistroResponse.UsuarioDTO usuarioDTO = new RegistroResponse.UsuarioDTO(
+                usuarioSalvo.getId(),
+                usuarioSalvo.getNome(),
+                usuarioSalvo.getEmail()
+        );
+
+        return new RegistroResponse(token, usuarioDTO);
     }
 
     // Login
-    public String login(String email, String senha) {
+    public LoginResponse login(String email, String senha) {
         Usuario usuario = acessoRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        // Aqui você deve validar a senha (BCrypt)
-        // if (!passwordEncoder.matches(senha, usuario.getSenha())) {
-        //     throw new RuntimeException("Senha incorreta");
-        // }
-
-        // Validação simples (trocar por BCrypt em produção)
-        if (!usuario.getSenha().equals(senha)) {
+        // Validar a senha
+        if (!passwordEncoder.matches(senha, usuario.getSenha())) {
             throw new RuntimeException("Senha incorreta");
         }
 
-        // Aqui você deve gerar um JWT token
-        // return jwtUtil.generateToken(usuario);
+        // Verificar se usuário está ativo
+        if (usuario.getAtivo() != null && !usuario.getAtivo()) {
+            throw new RuntimeException("Usuário inativo");
+        }
 
-        return "token-jwt-aqui"; // Placeholder
+        // Gerar token (usando Basic Auth por enquanto)
+        String token = gerarToken(email, senha);
+
+        return new LoginResponse(token, usuario.getId(), usuario.getNome(), usuario.getEmail());
+    }
+
+    // Gerar token Basic Auth (em produção, usar JWT)
+    private String gerarToken(String email, String senha) {
+        String credentials = email + ":" + senha;
+        return "Basic " + Base64.getEncoder().encodeToString(credentials.getBytes());
+    }
+
+    // Validar token
+    public Usuario validarToken() {
+        // Como estamos usando Basic Auth com Spring Security,
+        // o usuário autenticado já está disponível no SecurityContext
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return buscarPorEmail(email);
     }
 
     // Buscar usuário por ID
@@ -101,6 +138,7 @@ public class AcessoService {
     // Deletar usuário (desativar)
     public void deletar(Long id) {
         Usuario usuario = buscarPorId(id);
+        usuario.setAtivo(false);
         acessoRepository.save(usuario);
     }
 
