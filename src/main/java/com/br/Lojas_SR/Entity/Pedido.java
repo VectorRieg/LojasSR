@@ -1,5 +1,6 @@
 package com.br.Lojas_SR.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;

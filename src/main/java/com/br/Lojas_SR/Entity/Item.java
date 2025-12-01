@@ -1,5 +1,6 @@
 package com.br.Lojas_SR.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -11,8 +12,10 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(nullable = false)
     private Long id;
+
     @ManyToOne
     @JoinColumn(name = "carrinho_id")
+    @JsonIgnore
     private Carrinho carrinho;
 
     @ManyToOne
@@ -26,6 +29,7 @@ public class Item {
 
     @ManyToOne
     @JoinColumn(name = "pedido_id")
+    @JsonIgnore
     private Pedido pedido;
 
     public Produto getProduto() { return produto; }

@@ -1,5 +1,6 @@
 package com.br.Lojas_SR.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -12,6 +13,8 @@ public class Usuario {
     private Long id;
     private String nome;
     private String email; // único
+
+    @JsonIgnore
     private String senha; // hash
     private String cpf;
     private String telefone;
@@ -27,9 +30,11 @@ public class Usuario {
     private Boolean ativo = true;
 
     @OneToOne(mappedBy = "usuario")
+    @JsonIgnore
     private Carrinho carrinho;
 
     @OneToMany(mappedBy = "usuario")
+    @JsonIgnore
     private List<Pedido> pedidos;
 
     public Long getId() {
