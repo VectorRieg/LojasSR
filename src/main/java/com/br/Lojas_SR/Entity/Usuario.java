@@ -24,6 +24,8 @@ public class Usuario {
     private String cidade;
     private String estado;
 
+    private Boolean ativo = true;
+
     @OneToOne(mappedBy = "usuario")
     private Carrinho carrinho;
 
@@ -61,5 +63,7 @@ public class Usuario {
     public void setBairro(String bairro) { this.bairro = bairro; }
     public void setCidade(String cidade) { this.cidade = cidade; }
     public void setEstado(String estado) { this.estado = estado; }
+    public Boolean getAtivo() { return ativo; }
+    public void setAtivo(Boolean ativo) { this.ativo = ativo; }
 
 }

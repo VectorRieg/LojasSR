@@ -1,5 +1,7 @@
 package com.br.Lojas_SR.Controller;
 
+import com.br.Lojas_SR.DTO.LoginResponse;
+import com.br.Lojas_SR.DTO.RegistroResponse;
 import com.br.Lojas_SR.Entity.Usuario;
 import com.br.Lojas_SR.Service.AcessoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,16 +18,23 @@ public class AcessoController {
 
     // Registro de novo usuario
     @PostMapping("/registro")
-    public ResponseEntity<Usuario> registrar(@RequestBody Usuario usuario) {
-        Usuario novoUsuario = acessoService.registrar(usuario);
-        return ResponseEntity.ok(novoUsuario);
+    public ResponseEntity<RegistroResponse> registrar(@RequestBody Usuario usuario) {
+        RegistroResponse response = acessoService.registrar(usuario);
+        return ResponseEntity.ok(response);
     }
 
     // Login
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
-        String token = acessoService.login(request.getEmail(), request.getSenha());
-        return ResponseEntity.ok(token);
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        LoginResponse response = acessoService.login(request.getEmail(), request.getSenha());
+        return ResponseEntity.ok(response);
+    }
+
+    // Validar token
+    @GetMapping("/validar")
+    public ResponseEntity<Usuario> validarToken() {
+        Usuario usuario = acessoService.validarToken();
+        return ResponseEntity.ok(usuario);
     }
 
     // Busca usuario por ID
