@@ -1,5 +1,6 @@
 package com.br.Lojas_SR.Service;
 
+import com.br.Lojas_SR.Config.JwtUtil;
 import com.br.Lojas_SR.DTO.LoginResponse;
 import com.br.Lojas_SR.DTO.RegistroResponse;
 import com.br.Lojas_SR.Entity.Usuario;
@@ -8,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -19,6 +19,9 @@ public class AcessoService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     // Registrar novo usuário
     public RegistroResponse registrar(Usuario usuario) {
@@ -32,17 +35,18 @@ public class AcessoService {
             throw new RuntimeException("CPF já cadastrado");
         }
 
-        // Guardar senha original para gerar token
-        String senhaOriginal = usuario.getSenha();
-
         // Criptografar a senha
         usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
         usuario.setAtivo(true);
 
         Usuario usuarioSalvo = acessoRepository.save(usuario);
 
-        // Gerar token (usando Basic Auth por enquanto)
-        String token = gerarToken(usuarioSalvo.getEmail(), senhaOriginal);
+        // Gerar token JWT
+        String token = jwtUtil.generateToken(
+                usuarioSalvo.getEmail(),
+                usuarioSalvo.getId(),
+                usuarioSalvo.getNome()
+        );
 
         // Criar resposta
         RegistroResponse.UsuarioDTO usuarioDTO = new RegistroResponse.UsuarioDTO(
@@ -69,22 +73,19 @@ public class AcessoService {
             throw new RuntimeException("Usuário inativo");
         }
 
-        // Gerar token (usando Basic Auth por enquanto)
-        String token = gerarToken(email, senha);
+        // Gerar token JWT
+        String token = jwtUtil.generateToken(
+                usuario.getEmail(),
+                usuario.getId(),
+                usuario.getNome()
+        );
 
         return new LoginResponse(token, usuario.getId(), usuario.getNome(), usuario.getEmail());
     }
 
-    // Gerar token Basic Auth (em produção, usar JWT)
-    private String gerarToken(String email, String senha) {
-        String credentials = email + ":" + senha;
-        return "Basic " + Base64.getEncoder().encodeToString(credentials.getBytes());
-    }
-
     // Validar token
     public Usuario validarToken() {
-        // Como estamos usando Basic Auth com Spring Security,
-        // o usuário autenticado já está disponível no SecurityContext
+        // O usuário autenticado já está disponível no SecurityContext
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return buscarPorEmail(email);
     }

@@ -1,5 +1,6 @@
 package com.br.Lojas_SR.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -35,6 +36,7 @@ public class Produto {
     private LocalDateTime dataCadastro;
 
     @OneToMany(mappedBy = "produto")
+    @JsonIgnore
     private List<Item> itens;
 
     public Long getId() { return id; }
