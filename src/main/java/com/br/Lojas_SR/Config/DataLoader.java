@@ -13,7 +13,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
-@Component
+// TEMPORARIAMENTE DESABILITADO - Aguardando criação automática das tabelas pelo Hibernate
+// Será reabilitado após primeira inicialização bem-sucedida
+// @Component
 public class DataLoader implements CommandLineRunner {
 
     @Autowired
