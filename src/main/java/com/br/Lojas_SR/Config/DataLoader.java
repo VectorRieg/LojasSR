@@ -13,7 +13,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
-@Component
+// Desabilitado temporariamente para permitir criação das tabelas
+// @Component
 public class DataLoader implements CommandLineRunner {
 
     @Autowired
