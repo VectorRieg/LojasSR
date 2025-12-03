@@ -27,16 +27,21 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Verifica se já existem dados
-        if (produtoRepository.count() > 0) {
-            System.out.println("Base de dados já contém produtos. Pulando inicialização...");
-            return;
+        System.out.println("Verificando necessidade de inicializar dados de exemplo...");
+
+        // Criar usuário de teste (se não existir)
+        try {
+            if (acessoRepository.existsByEmail("teste@lojassr.com")) {
+                System.out.println("Base de dados já contém dados. Pulando inicialização...");
+                return;
+            }
+        } catch (Exception e) {
+            // Tabelas ainda não foram criadas, continuar com inicialização
+            System.out.println("Inicializando base de dados com dados de exemplo...");
         }
 
-        System.out.println("Inicializando base de dados com dados de exemplo...");
-
         // Criar usuário de teste
-        if (!acessoRepository.existsByEmail("teste@lojassr.com")) {
+        try {
             Usuario usuarioTeste = new Usuario();
             usuarioTeste.setNome("Usuário Teste");
             usuarioTeste.setEmail("teste@lojassr.com");
@@ -52,6 +57,8 @@ public class DataLoader implements CommandLineRunner {
             usuarioTeste.setAtivo(true);
             acessoRepository.save(usuarioTeste);
             System.out.println("✅ Usuário teste criado: teste@lojassr.com / senha123");
+        } catch (Exception e) {
+            System.out.println("⚠️ Erro ao criar usuário teste: " + e.getMessage());
         }
 
         // Criar produtos de exemplo
